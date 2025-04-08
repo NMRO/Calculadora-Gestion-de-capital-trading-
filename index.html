@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Trading </title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 15px;
+      background-color: #f8f9fa;
+    }
+
+    .calculator-container {
+      background-color: white;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 5px;
+      font-size: 1.8em;
+    }
+
+    h2 {
+      color: #34495e;
+      text-align: center;
+      margin-top: 0;
+      font-size: 1.2em;
+      font-weight: normal;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #f8fafc;
+      border-radius: 8px;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .input-row label {
+      width: 180px;
+      font-weight: 600;
+      color: #4a5568;
+    }
+
+    .input-row input,
+    .input-row select {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    .input-row input:focus,
+    .input-row select:focus {
+      outline: none;
+      border-color: #4299e1;
+      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+    }
+
+    button {
+      background-color: #3182ce;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      display: block;
+      margin: 25px auto;
+      width: 100%;
+      max-width: 300px;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #2b6cb0;
+    }
+
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 15px;
+    }
+
+    .results-table th,
+    .results-table td {
+      border: 1px solid #e2e8f0;
+      padding: 12px;
+      text-align: center;
+      color: #000000 !important;
+      /* Texto negro obligatorio */
+    }
+
+    .results-table th {
+      background-color: #edf2f7;
+      font-weight: 600;
+    }
+
+    .viable {
+      background-color: #48bb78;
+      /* Verde */
+    }
+
+    .not-viable {
+      background-color: #f56565;
+      /* Rojo */
+    }
+
+    .viable,
+    .not-viable {
+      font-weight: bold;
+    }
+
+    .decimal-info {
+      font-size: 13px;
+      color: #718096;
+      margin-top: 5px;
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab.active {
+      border-bottom: 3px solid #3182ce;
+      font-weight: 600;
+      color: #3182ce;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="calculator-container">
+    <h1>GESTIÓN DE CAPITAL</h1>
+    <h2>Calculadora de viabilidad de trades</h2>
+
+    <div class="tabs">
+      <div class="tab active"></div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-row">
+        <label for="capital">Capital inicial (€):</label>
+        <input type="number" id="capital" value="15000" step="100">
+      </div>
+      <div class="input-row">
+        <label for="riskPercent">% Riesgo por operación:</label>
+        <input type="number" id="riskPercent" value="1" min="0.1" max="10" step="0.1">
+      </div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-row">
+        <label for="assetType">Tipo de activo:</label>
+        <select id="assetType">
+          <option value="indices">Índices</option>
+          <option value="forex">Forex (4 decimales)</option>
+          <option value="stocks">Acciones (2-3 decimales)</option>
+        </select>
+      </div>
+      <div class="input-row">
+        <label for="direction">Dirección del trade:</label>
+        <select id="direction">
+          <option value="alcista">Alcista</option>
+          <option value="bajista">Bajista</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-row">
+        <label for="entry">Precio de entrada:</label>
+        <input type="number" id="entry" step="0.0001" placeholder="15780 o 1.1050">
+      </div>
+      <div class="input-row">
+        <label for="takeProfit">Take Profit:</label>
+        <input type="number" id="takeProfit" step="0.0001" placeholder="15850 o 1.0809">
+      </div>
+      <div class="input-row">
+        <label for="stopLoss">Stop Loss:</label>
+        <input type="number" id="stopLoss" step="0.0001" placeholder="15650 o 1.1400">
+      </div>
+      <div class="decimal-info">* Usa 4 decimales para Forex, 2-3 para acciones</div>
+    </div>
+
+    <button onclick="calculate()">CALCULAR VIABILIDAD DEL TRADE</button>
+
+    <table class="results-table">
+      <tr>
+        <th>Beneficio potencial</th>
+        <th>Riesgo potencial</th>
+        <th>Ratio R/B</th>
+        <th>Contratos/Posición</th>
+        <th>Viabilidad</th>
+      </tr>
+      <tr id="resultRow">
+        <td id="potentialProfit">-</td>
+        <td id="potentialRisk">-</td>
+        <td id="riskRewardRatio">-</td>
+        <td id="positionSize">-</td>
+        <td id="viability">-</td>
+      </tr>
+    </table>
+  </div>
+
+  <script>
+    function calculate() {
+      // Obtener valores de entrada
+      const capital = parseFloat(document.getElementById('capital').value);
+      const riskPercent = parseFloat(document.getElementById('riskPercent').value);
+      const entry = parseFloat(document.getElementById('entry').value);
+      const takeProfit = parseFloat(document.getElementById('takeProfit').value);
+      const stopLoss = parseFloat(document.getElementById('stopLoss').value);
+      const direction = document.getElementById('direction').value;
+      const assetType = document.getElementById('assetType').value;
+      // Validaciones básicas
+      if (isNaN(entry) || isNaN(takeProfit) || isNaN(stopLoss)) {
+        alert("Por favor completa todos los campos numéricos");
+        return;
+      }
+      // Calcular riesgo y beneficio
+      let risk, reward;
+      if (direction === 'alcista') {
+        risk = entry - stopLoss;
+        reward = takeProfit - entry;
+      } else {
+        risk = stopLoss - entry;
+        reward = entry - takeProfit;
+      }
+      // Asegurar valores positivos
+      risk = Math.abs(risk);
+      reward = Math.abs(reward);
+      // Calcular ratio riesgo/beneficio
+      const riskRewardRatio = (reward / risk).toFixed(2);
+      // Calcular tamaño de posición
+      const riskAmount = capital * (riskPercent / 100);
+      let positionSize = Math.floor(riskAmount / risk);
+      // Ajustar para forex (lotes) o acciones (contratos)
+      if (assetType === 'forex') {
+        positionSize = (riskAmount / risk).toFixed(2);
+      }
+      // Determinar viabilidad (ratio mínimo de 1:1)
+      const viable = riskRewardRatio >= 1;
+      // Mostrar resultados SIN decimales
+      document.getElementById('potentialProfit').textContent = Math.round(reward);
+      document.getElementById('potentialRisk').textContent = Math.round(risk);
+      document.getElementById('riskRewardRatio').textContent = riskRewardRatio;
+      document.getElementById('positionSize').textContent = viable ? Math.round(positionSize) : '0';
+      const viabilityCell = document.getElementById('viability');
+      viabilityCell.textContent = viable ? 'VIABLE' : 'NO VIABLE';
+      // Colorear toda la fila de resultados (con texto negro)
+      document.getElementById('resultRow').className = viable ? 'viable' : 'not-viable';
+    }
+    // Configurar el tipo de activo para cambiar el step de los inputs
+    document.getElementById('assetType').addEventListener('change', function() {
+      const step = this.value === 'forex' ? '0.0001' : '0.01';
+      document.getElementById('entry').step = step;
+      document.getElementById('takeProfit').step = step;
+      document.getElementById('stopLoss').step = step;
+    });
+  </script>
+</body>
+
+</html>
