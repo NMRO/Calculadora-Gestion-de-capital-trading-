@@ -1,0 +1,1 @@
+# Calculadora-Gestion-de-capital-trading-
