@@ -104,7 +104,6 @@
       padding: 12px;
       text-align: center;
       color: #000000 !important;
-      /* Texto negro obligatorio */
     }
 
     .results-table th {
@@ -114,12 +113,10 @@
 
     .viable {
       background-color: #48bb78;
-      /* Verde */
     }
 
     .not-viable {
       background-color: #f56565;
-      /* Rojo */
     }
 
     .viable,
@@ -229,7 +226,6 @@
 
   <script>
     function calculate() {
-      // Obtener valores de entrada
       const capital = parseFloat(document.getElementById('capital').value);
       const riskPercent = parseFloat(document.getElementById('riskPercent').value);
       const entry = parseFloat(document.getElementById('entry').value);
@@ -237,13 +233,13 @@
       const stopLoss = parseFloat(document.getElementById('stopLoss').value);
       const direction = document.getElementById('direction').value;
       const assetType = document.getElementById('assetType').value;
-      // Validaciones básicas
+
       if (isNaN(entry) || isNaN(takeProfit) || isNaN(stopLoss)) {
         alert("Por favor completa todos los campos numéricos");
         return;
       }
-      // Calcular riesgo y beneficio
-      let risk, reward;
+
+      let risk = 0, reward = 0;
       if (direction === 'alcista') {
         risk = entry - stopLoss;
         reward = takeProfit - entry;
@@ -251,32 +247,29 @@
         risk = stopLoss - entry;
         reward = entry - takeProfit;
       }
-      // Asegurar valores positivos
+
       risk = Math.abs(risk);
       reward = Math.abs(reward);
-      // Calcular ratio riesgo/beneficio
       const riskRewardRatio = (reward / risk).toFixed(2);
-      // Calcular tamaño de posición
       const riskAmount = capital * (riskPercent / 100);
-      let positionSize = Math.floor(riskAmount / risk);
-      // Ajustar para forex (lotes) o acciones (contratos)
-      if (assetType === 'forex') {
-        positionSize = (riskAmount / risk).toFixed(2);
-      }
-      // Determinar viabilidad (ratio mínimo de 1:1)
-      const viable = riskRewardRatio >= 1;
-      // Mostrar resultados SIN decimales
-      document.getElementById('potentialProfit').textContent = Math.round(reward);
-      document.getElementById('potentialRisk').textContent = Math.round(risk);
+      let positionSize = riskAmount / risk;
+
+      // Mostrar con 2 decimales siempre
+      const formattedPositionSize = positionSize.toFixed(2);
+
+      const viable = parseFloat(riskRewardRatio) >= 1;
+
+      document.getElementById('potentialProfit').textContent = reward.toFixed(2);
+      document.getElementById('potentialRisk').textContent = risk.toFixed(2);
       document.getElementById('riskRewardRatio').textContent = riskRewardRatio;
-      document.getElementById('positionSize').textContent = viable ? Math.round(positionSize) : '0';
+      document.getElementById('positionSize').textContent = formattedPositionSize;
+
       const viabilityCell = document.getElementById('viability');
       viabilityCell.textContent = viable ? 'VIABLE' : 'NO VIABLE';
-      // Colorear toda la fila de resultados (con texto negro)
       document.getElementById('resultRow').className = viable ? 'viable' : 'not-viable';
     }
-    // Configurar el tipo de activo para cambiar el step de los inputs
-    document.getElementById('assetType').addEventListener('change', function() {
+
+    document.getElementById('assetType').addEventListener('change', function () {
       const step = this.value === 'forex' ? '0.0001' : '0.01';
       document.getElementById('entry').step = step;
       document.getElementById('takeProfit').step = step;
